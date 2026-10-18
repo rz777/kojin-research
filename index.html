@@ -1,0 +1,40 @@
+
+---
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Demos</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+    a { color: #79b8ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    li { padding: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>HTML Demos</h1>
+  <ul>
+    {% assign files = site.static_files | sort: "name" %}
+    {% for file in files %}
+      {% assign root_path = '/' | append: file.name %}
+      {% if file.extname == '.html' and file.path == root_path and file.name != 'index.html' %}
+        <li>
+          <a href="{{ file.path | relative_url }}">
+            {{ file.name | escape }}
+          </a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</body>
+</html>

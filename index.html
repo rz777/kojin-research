@@ -1,12 +1,9 @@
-
----
----
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HTML Demos</title>
+  <title>Kojin Research — HTML Demos</title>
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -16,25 +13,66 @@
       margin: 60px auto;
       padding: 20px;
     }
-    a { color: #79b8ff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    li { padding: 10px 0; }
+    h1 { margin-bottom: 8px; }
+    p { color: #999; }
+    ul { padding: 0; list-style: none; }
+    li { border-bottom: 1px solid #333; }
+    a {
+      display: block;
+      padding: 14px 8px;
+      color: #79b8ff;
+      text-decoration: none;
+    }
+    a:hover { background: #222; }
   </style>
 </head>
 <body>
-  <h1>HTML Demos</h1>
-  <ul>
-    {% assign files = site.static_files | sort: "name" %}
-    {% for file in files %}
-      {% assign root_path = '/' | append: file.name %}
-      {% if file.extname == '.html' and file.path == root_path and file.name != 'index.html' %}
-        <li>
-          <a href="{{ file.path | relative_url }}">
-            {{ file.name | escape }}
-          </a>
-        </li>
-      {% endif %}
-    {% endfor %}
-  </ul>
+  <h1>Kojin Research</h1>
+  <p id="status">Loading HTML demos...</p>
+  <ul id="files"></ul>
+
+  <script>
+    const repo = "rz777/kojin-research";
+    const api = `https://api.github.com/repos/${repo}/contents/`;
+
+    async function loadFiles() {
+      const status = document.getElementById("status");
+      const list = document.getElementById("files");
+
+      try {
+        const response = await fetch(api);
+        if (!response.ok) throw new Error(response.status);
+
+        const data = await response.json();
+        const files = data
+          .filter(file =>
+            file.type === "file" &&
+            file.name.toLowerCase().endsWith(".html") &&
+            file.name.toLowerCase() !== "index.html"
+          )
+          .sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, {
+              numeric: true
+            })
+          );
+
+        status.textContent = `${files.length} HTML demos available`;
+
+        for (const file of files) {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = "./" + encodeURIComponent(file.name);
+          a.textContent = file.name;
+          li.appendChild(a);
+          list.appendChild(li);
+        }
+      } catch (error) {
+        status.textContent = "Failed to load file list.";
+        console.error(error);
+      }
+    }
+
+    loadFiles();
+  </script>
 </body>
 </html>
